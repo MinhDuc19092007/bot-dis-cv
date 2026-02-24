@@ -1,0 +1,40 @@
+# Discord Bot Requirements
+# ItemsAdder to Bedrock Converter Bot v3.0
+
+# Core Discord
+discord.py>=2.3.0
+
+# System monitoring (cho /uptime command)
+psutil>=5.9.0
+
+# HTTP requests (cho download từ URLs và upload lên Catbox/Gofile)
+requests>=2.31.0
+
+# File handling (nếu cần xử lý ZIP nâng cao - optional)
+# zipfile đã có sẵn trong Python standard library
+
+# UUID generation (đã có sẵn trong Python standard library)
+# uuid
+
+# JSON handling (đã có sẵn trong Python standard library)
+# json
+
+# Datetime (đã có sẵn trong Python standard library)
+# datetime
+
+# ==================================================
+# OPTIONAL: Nếu muốn thêm features sau này
+# ==================================================
+
+# PIL/Pillow - Xử lý ảnh nâng cao
+# Pillow>=10.0.0
+
+# YAML support - Nếu cần đọc config files
+# PyYAML>=6.0
+
+# Async HTTP (thay thế requests nếu muốn full async)
+# aiohttp>=3.8.0
+
+# Database alternatives
+# motor>=3.0.0  # MongoDB async
+# aiomysql>=0.1.1  # MySQL async
