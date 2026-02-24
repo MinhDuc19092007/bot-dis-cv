@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 # ==================== CẤU HÌNH BOT ====================
-TOKEN = "MTMyMDgxOTE4NjI2MjA5Nzk5MA.GJ9K5P.sI0A7ySF6wWh5jb9uSI5G2FzvvIDPjmSlGCsNU"  # ⬅️ DÁN TOKEN VÀO ĐÂY
+TOKEN = "MTQ3MjQwNzE2NzE0NjM5Nzg1OQ.G8Y8fF.s82EQ7uvFUSy-EsDSzmQWx_QrDiXuPm0i6IKpk"  # ⬅️ DÁN TOKEN VÀO ĐÂY
 
 ADMIN_IDS = [1268159962564132864, 1093451783835226142]
 DATABASE_FILE = "bot_database.json"
