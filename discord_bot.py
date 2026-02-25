@@ -15,11 +15,19 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 # ==================== CẤU HÌNH BOT ====================
-TOKEN = "MTQ3MjQwNzE2NzE0NjM5Nzg1OQ.G8Y8fF.s82EQ7uvFUSy-EsDSzmQWx_QrDiXuPm0i6IKpk"  # ⬅️ DÁN TOKEN VÀO ĐÂY
+# Đọc từ environment variables (Railway) hoặc fallback
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "YOUR_TOKEN_HERE")
 
-ADMIN_IDS = [1268159962564132864, 1093451783835226142]
-DATABASE_FILE = "bot_database.json"
-TEMP_DIR = os.path.abspath("temp_conversions")
+# Admin IDs - Parse từ env variable
+ADMIN_IDS_STR = os.getenv("ADMIN_IDS", "")
+if ADMIN_IDS_STR:
+    ADMIN_IDS = [int(uid.strip()) for uid in ADMIN_IDS_STR.split(",") if uid.strip()]
+else:
+    # Fallback hardcoded
+    ADMIN_IDS = [1268159962564132864, 1093451783835226142]
+
+DATABASE_FILE = os.getenv("DATABASE_FILE", "bot_database.json")
+TEMP_DIR = os.path.abspath(os.getenv("TEMP_DIR", "temp_conversions"))
 START_TIME = time.time()
 
 # Màu sắc chủ đạo
@@ -1841,7 +1849,7 @@ if __name__ == "__main__":
     print(f"{EMOJI['loading']} Đang kết nối...\n")
     
     try:
-        bot.run(TOKEN)
+        bot.run(DISCORD_TOKEN)
     except discord.LoginFailure:
         print(f"\n{EMOJI['error']} TOKEN không hợp lệ! Vui lòng kiểm tra lại.\n")
     except Exception as e:
