@@ -1841,9 +1841,10 @@ if __name__ == "__main__":
     print(f"  {EMOJI['rocket']} KHỞI ĐỘNG BOT CHUYỂN ĐỔI PACK")
     print("="*70)
     
-    if TOKEN == "MTMyMDgxOTE4NjI2MjA5Nzk5MA.GJ9K5P.sI0A7ySF6wWh5jb9uSI5G2FzvvIDPjmSlGCsNU":
-        print(f"\n{EMOJI['error']} CẢNH BÁO: Vui lòng thay TOKEN của bạn vào dòng 24!")
-        print(f"{EMOJI['info']} Tìm TOKEN tại: Discord Developer Portal → Bot → Token\n")
+    if DISCORD_TOKEN == "YOUR_TOKEN_HERE":
+        print(f"\n{EMOJI['error']} CẢNH BÁO: Vui lòng set DISCORD_TOKEN!")
+        print(f"{EMOJI['info']} Railway: Set trong Variables")
+        print(f"{EMOJI['info']} Local: Set trong .env hoặc environment variable\n")
         sys.exit(1)
     
     print(f"{EMOJI['loading']} Đang kết nối...\n")
@@ -1851,6 +1852,6 @@ if __name__ == "__main__":
     try:
         bot.run(DISCORD_TOKEN)
     except discord.LoginFailure:
-        print(f"\n{EMOJI['error']} TOKEN không hợp lệ! Vui lòng kiểm tra lại.\n")
+        print(f"\n{EMOJI['error']} DISCORD_TOKEN không hợp lệ! Vui lòng kiểm tra lại.\n")
     except Exception as e:
         print(f"\n{EMOJI['error']} Lỗi: {e}\n")
