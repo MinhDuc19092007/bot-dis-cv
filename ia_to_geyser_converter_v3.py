@@ -441,11 +441,14 @@ class IAToGeyserConverterV3:
                     bedrock_id = bid
                     break
             
-            mappings["items"][item_id] = {
-                "name": item_id,
-                "bedrock_identifier": bedrock_id,
-                "icon": f"textures/{item_id.replace(':', '/')}"
-            }
+            # Geyser yêu cầu mỗi item phải là ARRAY chứa objects
+            mappings["items"][item_id] = [
+                {
+                    "name": item_id,
+                    "bedrock_identifier": bedrock_id,
+                    "icon": f"textures/{item_id.replace(':', '/')}"
+                }
+            ]
         
         # Save
         geyser_dir = os.path.join(self.output_dir, "geyser")
