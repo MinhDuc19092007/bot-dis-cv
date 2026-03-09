@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 ╔══════════════════════════════════════════════════════════════╗
-║  ItemsAdder to GeyserMC Converter v3.0                      ║
+║  ItemsAdder to GeyserMC Converter v3.0 - FIXED               ║
 ║  Convert TOÀN BỘ: Models, Textures, Sounds, Animations      ║
+║  🔧 FIX: Correct custom_mappings.json format for Geyser 2.9+ ║
 ╚══════════════════════════════════════════════════════════════╝
 
 Hỗ trợ:
@@ -10,7 +11,7 @@ Hỗ trợ:
   ✅ Sounds (.ogg, .wav)
   ✅ Animations (OptiFine CEM/CIT)
   ✅ Particles (nếu có)
-  ✅ Geyser custom mappings
+  ✅ Geyser custom mappings (FIXED format)
   ✅ Bedrock .mcpack + .zip
 """
 
@@ -34,6 +35,7 @@ class IAToGeyserConverterV3:
       - Thêm particles support
       - Better error handling
       - Progress reporting
+      - 🔧 FIX: Correct Geyser 2.9+ custom_mappings format
     """
     
     def __init__(self, input_zip: str, output_dir: str = "output"):
@@ -399,11 +401,29 @@ class IAToGeyserConverterV3:
             json.dump(item_textures, f, indent=2, ensure_ascii=False)
     
     # ══════════════════════════════════════════════════════════
-    #  STEP 4: GEYSER MAPPINGS
+    #  STEP 4: GEYSER MAPPINGS (FIXED!)
     # ══════════════════════════════════════════════════════════
     def create_geyser_mappings(self):
-        """Create Geyser custom mappings"""
-        print("\n🗺️  Creating Geyser mappings...")
+        """Create Geyser custom mappings - FIXED format for v2.9+"""
+        print("\n🗺️  Creating Geyser mappings (format v2)...")
+        
+        # 🔧 FIX: Format correto para Geyser 2.9.4+
+        # Estrutura:
+        # {
+        #   "format_version": 2,
+        #   "items": {
+        #     "namespace:item_id": {  ← Object, NOT array!
+        #       "name": "namespace:item_id",
+        #       "displayName": "...",
+        #       "icon": "texture_path",
+        #       "allowOffhand": false,
+        #       "components": {
+        #         "minecraft:icon": { "texture": "texture_path" },
+        #         "minecraft:max_stack_size": 64
+        #       }
+        #     }
+        #   }
+        # }
         
         mappings = {
             "format_version": 2,
@@ -441,23 +461,32 @@ class IAToGeyserConverterV3:
                     bedrock_id = bid
                     break
             
-            # Geyser yêu cầu mỗi item phải là ARRAY chứa objects
-            mappings["items"][item_id] = [
-                {
-                    "name": item_id,
-                    "bedrock_identifier": bedrock_id,
-                    "icon": f"textures/{item_id.replace(':', '/')}"
+            # 🔧 FIXED: Create object instead of array
+            # Include all required components
+            mappings["items"][item_id] = {
+                "name": item_id,
+                "displayName": item_name.replace('_', ' ').title(),
+                "icon": f"textures/{item_id.replace(':', '/')}",
+                "allowOffhand": False,
+                "components": {
+                    "minecraft:icon": {
+                        "texture": f"textures/{item_id.replace(':', '/')}"
+                    },
+                    "minecraft:max_stack_size": 64,
+                    "minecraft:hand_equipped": False
                 }
-            ]
+            }
         
         # Save
         geyser_dir = os.path.join(self.output_dir, "geyser")
         os.makedirs(geyser_dir, exist_ok=True)
         
-        with open(os.path.join(geyser_dir, "custom_mappings.json"), 'w') as f:
+        mappings_path = os.path.join(geyser_dir, "custom_mappings.json")
+        with open(mappings_path, 'w', encoding='utf-8') as f:
             json.dump(mappings, f, indent=2, ensure_ascii=False)
         
-        print(f"  ✅ Created {len(mappings['items'])} mappings")
+        print(f"  ✅ Created {len(mappings['items'])} mappings (format v2)")
+        print(f"  📄 Saved to: {mappings_path}")
     
     # ══════════════════════════════════════════════════════════
     #  STEP 5: PACKAGE
@@ -488,11 +517,18 @@ class IAToGeyserConverterV3:
     #  STEP 6: DOCS
     # ══════════════════════════════════════════════════════════
     def create_readme(self):
-        """Create README.md"""
+        """Create README.md with installation instructions"""
         readme = f"""# Pack Conversion Report
 
-**Converter:** IAToGeyserConverter v3.0  
+**Converter:** IAToGeyserConverter v3.0 (FIXED)  
 **Date:** {Path(self.input_zip).name}
+
+## 🔧 Fixes Applied
+
+- ✅ Fixed `custom_mappings.json` format for Geyser 2.9.4+
+- ✅ Changed items structure from Array to Object
+- ✅ Added required `components` with `minecraft:icon` and `minecraft:max_stack_size`
+- ✅ Proper texture path handling
 
 ## Resources Converted
 
@@ -508,7 +544,7 @@ class IAToGeyserConverterV3:
 
 - ✅ `ItemsAdder_Bedrock.mcpack` - For Bedrock players
 - ✅ `bedrock_pack.zip` - For Geyser server
-- ✅ `custom_mappings.json` - Geyser configuration
+- ✅ `custom_mappings.json` - Geyser configuration (FIXED)
 
 ## Installation
 
@@ -517,14 +553,21 @@ class IAToGeyserConverterV3:
 2. Open it → Minecraft imports automatically
 3. Enable in Global Resources
 
-### For Geyser Servers:
+### For Geyser Servers (v2.9.4+):
 1. Upload `bedrock_pack.zip` to `plugins/Geyser-Spigot/packs/`
 2. Copy `custom_mappings.json` to `plugins/Geyser-Spigot/custom_mappings/`
 3. Run `/geyser reload`
+4. Check console for any remaining errors
+
+### Troubleshooting:
+If you still see "no model present" errors:
+- Verify all texture files exist in the output
+- Check that texture paths in custom_mappings.json are correct
+- Ensure textures folder structure is: `textures/namespace/item_name.png`
 
 ---
 
-*Generated by IAToGeyserConverter v3.0*
+*Generated by IAToGeyserConverter v3.0 (FIXED)*
 """
         
         with open(os.path.join(self.output_dir, "README.md"), 'w', encoding='utf-8') as f:
@@ -545,8 +588,9 @@ class IAToGeyserConverterV3:
     def convert(self):
         """Main conversion pipeline"""
         print("\n" + "="*60)
-        print("  🚀 ItemsAdder → Bedrock Converter v3.0")
+        print("  🚀 ItemsAdder → Bedrock Converter v3.0 (FIXED)")
         print("  With Sounds, Animations, Particles Support!")
+        print("  🔧 Geyser 2.9.4+ Compatible")
         print("="*60)
         
         try:
@@ -563,7 +607,7 @@ class IAToGeyserConverterV3:
             # Step 3: Build
             bedrock_dir = self.build_bedrock_pack()
             
-            # Step 4: Mappings
+            # Step 4: Mappings (FIXED)
             self.create_geyser_mappings()
             
             # Step 5: Package
