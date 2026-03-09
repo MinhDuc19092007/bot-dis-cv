@@ -218,7 +218,7 @@ class IAToGeyserConverterV3:
         
         for anim_dir in optifine_dirs:
             if not os.path.exists(anim_dir):
-                continue
+                              continue
             
             for root, _, files in os.walk(anim_dir):
                 for f in files:
@@ -410,37 +410,23 @@ class IAToGeyserConverterV3:
             "items": {}
         }
         
-        # Base item type map
-        item_type_map = {
-            'sword': 'minecraft:diamond_sword',
-            'axe': 'minecraft:diamond_axe',
-            'pickaxe': 'minecraft:diamond_pickaxe',
-            'shovel': 'minecraft:diamond_shovel',
-            'hoe': 'minecraft:diamond_hoe',
-            'bow': 'minecraft:bow',
-            'crossbow': 'minecraft:crossbow',
-            'helmet': 'minecraft:diamond_helmet',
-            'chestplate': 'minecraft:diamond_chestplate',
-            'chest': 'minecraft:diamond_chestplate',
-            'leggings': 'minecraft:diamond_leggings',
-            'boots': 'minecraft:diamond_boots',
-            'gem': 'minecraft:emerald',
-            'crystal': 'minecraft:amethyst_shard',
-            'orb': 'minecraft:ender_pearl',
-            'scroll': 'minecraft:paper',
-            'key': 'minecraft:tripwire_hook',
-        }
-        
+        def _safe_bedrock_name(raw_item_id: str) -> str:
+            """Build a safe custom Bedrock identifier for Geyser mapping v2.
+
+            IMPORTANT: Geyser custom mappings v2 does not allow `minecraft:` as namespace
+            for `bedrock_identifier`.
+            """
+            _, raw_name = raw_item_id.split(':', 1)
+            safe = re.sub(r'[^a-z0-9_./-]', '_', raw_name.lower())
+            safe = safe.replace('/', '_').replace('.', '_').replace('-', '_')
+            safe = re.sub(r'_+', '_', safe).strip('_') or "item"
+            return f"geysermc:{safe}"
+
         for item_id in self.custom_models.keys():
-            item_name = item_id.split(':')[-1].lower()
-            
-            # Detect bedrock identifier
-            bedrock_id = 'minecraft:stick'
-            for keyword, bid in item_type_map.items():
-                if keyword in item_name:
-                    bedrock_id = bid
-                    break
-            
+            # Use a non-minecraft namespace to avoid
+            # `namespace cannot be minecraft` startup error.
+            bedrock_id = _safe_bedrock_name(item_id)
+
             # Geyser yêu cầu mỗi item phải là ARRAY chứa objects
             mappings["items"][item_id] = [
                 {
@@ -452,7 +438,7 @@ class IAToGeyserConverterV3:
         
         # Save
         geyser_dir = os.path.join(self.output_dir, "geyser")
-        os.makedirs(geyser_dir, exist_ok=True)
+              os.makedirs(geyser_dir, exist_ok=True)
         
         with open(os.path.join(geyser_dir, "custom_mappings.json"), 'w') as f:
             json.dump(mappings, f, indent=2, ensure_ascii=False)
@@ -601,7 +587,7 @@ IAToGeyserConverter = IAToGeyserConverterV3
 
 # ══════════════════════════════════════════════════════════════
 #  CLI
-# ══════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     import sys
     
