@@ -410,22 +410,37 @@ class IAToGeyserConverterV3:
             "items": {}
         }
         
-       def _safe_bedrock_name(raw_item_id: str) -> str:
-            """Build a safe custom Bedrock identifier for Geyser mapping v2.
-
-            IMPORTANT: Geyser custom mappings v2 does not allow `minecraft:` as namespace
-            for `bedrock_identifier`.
-            """
-            _, raw_name = raw_item_id.split(':', 1)
-            safe = re.sub(r'[^a-z0-9_./-]', '_', raw_name.lower())
-            safe = safe.replace('/', '_').replace('.', '_').replace('-', '_')
-            safe = re.sub(r'_+', '_', safe).strip('_') or "item"
-            return f"geysermc:{safe}"
-
+        # Base item type map
+        item_type_map = {
+            'sword': 'diamond_sword',
+            'axe': 'diamond_axe',
+            'pickaxe': 'diamond_pickaxe',
+            'shovel': 'diamond_shovel',
+            'hoe': 'diamond_hoe',
+            'bow': 'bow',
+            'crossbow': 'crossbow',
+            'helmet': 'diamond_helmet',
+            'chestplate': 'diamond_chestplate',
+            'chest': 'diamond_chestplate',
+            'leggings': 'diamond_leggings',
+            'boots': 'diamond_boots',
+            'gem': 'emerald',
+            'crystal': 'amethyst_shard',
+            'orb': 'ender_pearl',
+            'scroll': 'paper',
+            'key': 'tripwire_hook',
+        }
+        
         for item_id in self.custom_models.keys():
-            # Use a non-minecraft namespace to avoid
-            # `namespace cannot be minecraft` startup error.
-            bedrock_id = _safe_bedrock_name(item_id)
+            item_name = item_id.split(':')[-1].lower()
+            
+            # Detect bedrock identifier
+            bedrock_id = 'stick'
+            for keyword, bid in item_type_map.items():
+                if keyword in item_name:
+                    bedrock_id = bid
+                    break
+            
             # Geyser yêu cầu mỗi item phải là ARRAY chứa objects
             mappings["items"][item_id] = [
                 {
